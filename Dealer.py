@@ -3,14 +3,22 @@
 
 class Dealer():
 
-	def __init__(self):
-		return self
+    _twist_limit = None
+    _hand_value = None
 
-	def playDealer(sD):
-    '''
-    '''
-    while sD < 17:
-        card = draw()
-        sD += card
+    def __init__(self, hv, tl = 17):
+        self._twist_limit = tl
+        self._hand_value = hv
 
-    return sD
+    @property    
+    def hand_value(self):
+        return self._hand_value
+
+    def playDealer(self, deck):
+        '''
+        '''
+        while self._hand_value < self._twist_limit:
+            card = deck.draw()
+            self._hand_value += card
+
+        return self.hand_value

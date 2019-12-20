@@ -15,7 +15,8 @@ def play_game():
 	'''Play an interation of the game until terminal state is reached. 
 	Use total reward received for game to update estimate of state value function.
 	'''
-	global df_value
+	global v
+	global n
 
 	states_visited = []
 	game_reward = 0
@@ -39,17 +40,13 @@ def play_game():
 
 	# Assign reward to states, update value function
 	for s in states_visited:
-		i = df_value.loc[df_value["state"] == s].index
 
-		assert len(i) in [0,1]
-
-		if len(i) == 0:
-			row = {"state":s, "n":1, "v":game_reward}
-			df_value = df_value.append(row, ignore_index = True)
+		if s not in n.keys():
+			n[s] = 1
+			v[s] = game_reward
 		else:
-			ind = i[0]
-			df_value.loc[ind, "n"] += 1
-			df_value.loc[ind, "v"] += (1/float(df_value.loc[ind, "n"]))*(game_reward - df_value.loc[ind, "v"])
+			n[s] += 1
+			v[s] += (1/float(n[s]))*(game_reward - v[s])
 
 
 # Function to play many card games in order to estimate value function

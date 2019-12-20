@@ -11,12 +11,14 @@ class Environment():
     _deck = None
     _dealer = None
     _agent_hand = None
+    _terminal = None
 
     def __init__(self):
         # Initialise a deck of cards and a dealer
         self._deck = Deck()
         self._dealer = Dealer(abs(self._deck.draw()))
         self._agent_hand = abs(self._deck.draw())
+        self._terminal = False
 
     @property
     def agent_hand(self):
@@ -25,6 +27,10 @@ class Environment():
     @property
     def dealer_hand(self):
         return self._dealer.hand_value
+
+    @property
+    def is_state_terminal(self):
+        return self._terminal
 
     @property
     def state(self):
@@ -46,10 +52,10 @@ class Environment():
         assert isinstance(a,bool)
 
         # Check if state is terminal - not sure if this should be here or after each action
-        if self.isTerminal(self.state):
+        if self._terminal:
             # Reward for terminal state is given when first transition into this state.
             # Subsequent rewards for being in the terminal state are 0
-            return (None, 0)
+            return (self.state, 0)
 
         # Not terminal so agent makes action
         # Environment generates a sample of new states
@@ -64,8 +70,9 @@ class Environment():
                 self._agent_hand += self._deck.draw()
 
             s = self.state
+            self._terminal = self.isTerminal(self.state)
             r = self.reward(s)
-
+            
             return (s,r)
 
 
@@ -85,7 +92,7 @@ class Environment():
         '''
         ah, dh = s
 
-        if self.isTerminal(s) == False:
+        if self._terminal == False:
             return 0
 
         if (ah > 21) | (ah < 0):

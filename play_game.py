@@ -10,13 +10,13 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
 
-def epsilon_greedy_action(q,s,k):
+def epsilon_greedy_action(q,n,s,k):
 	'''Impliment e-greedy action choice. Based on current state, action value function, and number of elapsed episodes
 	make an e-greedy action choice. In this way, the agent policy is updated.
 	'''
 
 	# Set epsilon
-	e = float(1/k)
+	e = 100/(100 + n[s].sum())
 
 	if random.random()<=e:
 		# Choose random action
@@ -46,7 +46,7 @@ def play_game(q, n, k):
 
 	# get action, record state
 	while card_table.is_state_terminal == False:
-		a = epsilon_greedy_action(q,s,k)
+		a = epsilon_greedy_action(q,n,s,k)
 		sa = s + (a,)
 		state_actions_visited.append(sa)
 
@@ -58,7 +58,8 @@ def play_game(q, n, k):
 	# Assign reward to states, update value function
 	for sa in state_actions_visited:
 		n[sa] += 1
-		q[sa] += (1/float(n[sa]))*(game_reward - q[sa])
+		alpha = (1/float(n[sa]))
+		q[sa] += alpha*(game_reward - q[sa])
 
 	return q, n
 

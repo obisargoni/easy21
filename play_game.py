@@ -10,7 +10,7 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
 
-def play_game(v, n):
+def play_game(q, n):
 	'''Play an interation of the game until terminal state is reached. 
 	Use total reward received for game to update estimate of state value function.
 	'''
@@ -37,45 +37,39 @@ def play_game(v, n):
 
 	# Assign reward to states, update value function
 	for s in states_visited:
+		# Convert state expressed in terms of card values and True/False action to indexes for identifying that state in the action-value func
+		_s = (s[0]-1, s[1]-1, int(s[2]))
 
-		if s not in n.keys():
-			n[s] = 1
-			v[s] = game_reward
-		else:
-			n[s] += 1
-			v[s] += (1/float(n[s]))*(game_reward - v[s])
+		n[_s] += 1
+		q[_s] += (1/float(n[_s]))*(game_reward - q[_s])
 
-	return v, n
+	return q, n
 
 
-def estimate_value_function(n_iters):
+def monte_carlo_control(n_iters):
 	
-	v = {}
-	n = {}
+	# State space is agent hand x dealer hand x agent actions (22 x 10 x 2)
+	q = np.zeros([21,10,2])
+	n = np.zeros([21,10,2])
 	
 	# Function to play many card games in order to estimate value function
 	for i in range(n_iters):
-		v,n = play_game(v,n)
+		q,n = play_game(q,n)
 
-	# Now unpack value estimation of each state
-	k = v.keys()
-	#k = list(k)
-	v_list = [ list(i) + [v[i]] for i in k]
-	df_value = pd.DataFrame(columns = ['hand1', 'hand2', 'action', 'value'], data = v_list)
+	return q
 
-	return df_value
-
-def plot_value_function(df_value):
+def plot_value_function(q):
 	# Plot values
 
 	# Create 2d arrays to represent all possible dealer and player hands
 	x = np.arange(1,11) * np.ones(10)[:, np.newaxis]
 	y = np.ones([10,10]) * np.arange(12,22)[:, np.newaxis]
-	z = np.zeros([10,10])
 
-	for i, r in df_value.iterrows():
-	    if r['hand1'] > 11:
-	        z[r['hand1']-12,r['hand2']-1] = r['value']
+	# Need to average over actions to get state value function
+	v = np.average(q, axis = 2)
+
+	# Select just the states we are interested in plotting
+	z = v[11:,:]
 
 	fig = plt.figure()
 	ax = fig.add_subplot(111, projection='3d')
@@ -86,11 +80,11 @@ def plot_value_function(df_value):
 	return ax
 
 
-df_value_10k = estimate_value_function(10000)
-plot_value_function(df_value_10k)
+q10k = monte_carlo_control(10000)
+plot_value_function(q10k)
 
-df_value_50k = estimate_value_function(50000)
-plot_value_function(df_value_50k)
+q50k = monte_carlo_control(50000)
+plot_value_function(q50k)
 
-df_value_100k = estimate_value_function(100000)
-plot_value_function(df_value_100k)
+q100k = monte_carlo_control(100000)
+plot_value_function(q100k)

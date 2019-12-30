@@ -95,7 +95,7 @@ class Environment():
         if self._terminal == False:
             return 0
 
-        if (ah > 21) | (ah < 0):
+        if (ah > 21) | (ah < 1):
             r = -1
         elif (dh > 21):
             r = 1
@@ -114,7 +114,7 @@ class Environment():
         '''
         ah, dh = s
 
-        if (ah > 21) | (ah < 0) | (dh >= 17):
+        if (ah > 21) | (ah < 1) | (dh >= 17):
             return True
         else:
             return False

@@ -1,7 +1,7 @@
 # Script to play easy21 game and learn optimal value function
 import numpy as np
 import pandas as pd
-from random import random
+import random
 from Environment import Environment
 
 import matplotlib as mpl
@@ -10,7 +10,24 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
 
-def play_game(q, n):
+def epsilon_greedy_action(q,s,k):
+	'''Impliment e-greedy action choice. Based on current state, action value function, and number of elapsed episodes
+	make an e-greedy action choice. In this way, the agent policy is updated.
+	'''
+
+	# Set epsilon
+	e = float(1/k)
+
+	if random.random()<=e:
+		# Choose random action
+		a = random.choice(np.arange(q[s].size))
+	else:
+		# Choose greedy
+		a = q[s].argmax()
+
+	return a
+
+def play_game(q, n, k):
 	'''Play an interation of the game until terminal state is reached. 
 	Use total reward received for game to update estimate of state value function.
 	'''

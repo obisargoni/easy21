@@ -32,33 +32,33 @@ def play_game(q, n, k):
 	Use total reward received for game to update estimate of state value function.
 	'''
 
-	states_visited = []
+	state_actions_visited = []
 	game_reward = 0
-	nA = 0
 
 	# Initialise a new game
 	card_table = Environment()
+
+	# State is (agent hand, dealer hand)
 	s = card_table.state
+
+	# Adjust sate so that it matches with 0 indexed indices of ndarrays
+	s = (s[0]-1, s[1]-1)
 
 	# get action, record state
 	while card_table.is_state_terminal == False:
-		a = random() < 0.5
-		#s.append(a) Don't think states need to ne indexed by action as well
-		s = s +(a,)
-		states_visited.append(s)
+		a = epsilon_greedy_action(q,s,k)
+		sa = s + (a,)
+		state_actions_visited.append(sa)
 
 		# Take action, get new state and reward
 		s, r = card_table.step(a)
+		s = (s[0]-1, s[1]-1)
 		game_reward += r
-		nA += 1
 
 	# Assign reward to states, update value function
-	for s in states_visited:
-		# Convert state expressed in terms of card values and True/False action to indexes for identifying that state in the action-value func
-		_s = (s[0]-1, s[1]-1, int(s[2]))
-
-		n[_s] += 1
-		q[_s] += (1/float(n[_s]))*(game_reward - q[_s])
+	for sa in state_actions_visited:
+		n[sa] += 1
+		q[sa] += (1/float(n[sa]))*(game_reward - q[sa])
 
 	return q, n
 
@@ -68,10 +68,14 @@ def monte_carlo_control(n_iters):
 	# State space is agent hand x dealer hand x agent actions (22 x 10 x 2)
 	q = np.zeros([21,10,2])
 	n = np.zeros([21,10,2])
+
+	# Episode number
+	k = 0
 	
 	# Function to play many card games in order to estimate value function
 	for i in range(n_iters):
-		q,n = play_game(q,n)
+		k += 1
+		q,n = play_game(q,n,k)
 
 	return q
 
@@ -96,12 +100,12 @@ def plot_value_function(q):
 
 	return ax
 
-
+'''
 q10k = monte_carlo_control(10000)
 plot_value_function(q10k)
 
 q50k = monte_carlo_control(50000)
 plot_value_function(q50k)
-
-q100k = monte_carlo_control(100000)
-plot_value_function(q100k)
+'''
+q500k = monte_carlo_control(500000)
+plot_value_function(q500k)

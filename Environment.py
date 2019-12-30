@@ -49,7 +49,13 @@ class Environment():
         Returns:
             tuple. Sample of state resunting from input state and action.
         '''
-        assert isinstance(a,bool)
+        # Possible actions are True and False
+        if isinstance(a, bool):
+            pass
+        elif a in [0,1]:
+            a = bool(a)
+        else:
+            raise ValueError
 
         # Check if state is terminal - not sure if this should be here or after each action
         if self._terminal:

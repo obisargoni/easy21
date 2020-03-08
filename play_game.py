@@ -27,7 +27,7 @@ def epsilon_greedy_action(q,n,s,k):
 
 	return a
 
-def play_game(q, n, k):
+def mc_play_game(q, n, k):
 	'''Play an interation of the game until terminal state is reached. 
 	Use total reward received for game to update estimate of state value function.
 	'''
@@ -76,7 +76,7 @@ def monte_carlo_control(n_iters):
 	# Function to play many card games in order to estimate value function
 	for i in range(n_iters):
 		k += 1
-		q,n = play_game(q,n,k)
+		q,n = mc_play_game(q,n,k)
 
 	return q
 

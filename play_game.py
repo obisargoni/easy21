@@ -10,12 +10,12 @@ from mpl_toolkits.mplot3d import Axes3D
 import numpy as np
 import matplotlib.pyplot as plt
 
-def epsilon_greedy_action(q,n,s,k):
+def epsilon_greedy_action(q,n,s):
 	'''Impliment e-greedy action choice. Based on current state, action value function, and number of elapsed episodes
 	make an e-greedy action choice. In this way, the agent policy is updated.
 	'''
 
-	# Set epsilon
+	# Set epsilon - updated each time n[s] changes
 	e = 100/(100 + n[s].sum())
 
 	if random.random()<=e:
@@ -80,6 +80,59 @@ def monte_carlo_control(n_iters):
 
 	return q
 
+def sarsa_play_game(table, q, n):
+	'''Perform a single action and update teh state-action value function towards the estimated value using one step lookahead.
+	Update the policy
+	'''
+
+	gamma = 0.1
+
+	# State is (agent hand, dealer hand)
+	s = table.state
+
+	# Adjust sate so that it matches with 0 indexed indices of ndarrays
+	s = (s[0]-1, s[1]-1)
+
+	# get action, record state
+	a = epsilon_greedy_action(q,n,s)
+	sa = s + (a,)
+
+	# Take action, get new state and reward
+	s_, r = table.step(a)
+	s_ = (s_[0]-1, s_[1]-1)
+
+	# Need to get a_, action under this or previous policy?
+	# Use this policy since that is the action we would expect to take (haven't updated policy yet either)
+	a_ = epsilon_greedy_action(q,n,s_)
+	sa_ = s_ + (a_,)
+
+	# Update value function using rewards and estimate of value function of next state-action 
+	n[sa] += 1
+	alpha = (1/float(n[sa]))
+	q[sa] += alpha*(r + gamma*q[sa_] - q[sa])
+	
+	return q, n
+
+def sarsa_control(n_iters):
+	# State space is agent hand x dealer hand x agent actions (22 x 10 x 2)
+	q = np.zeros([21,10,2])
+	n = np.zeros([21,10,2])
+
+	# Episode number
+	k = 0
+
+	state_actions_visited = []
+	game_reward = 0
+
+	# Initialise a new game
+	card_table = Environment()
+
+	for i in range(n_iters):
+		while card_table.is_state_terminal == False:
+			q,n = sarsa_play_game(card_table, q, n)
+	return q
+
+
 def plot_value_function(q):
 	# Plot values
 
@@ -108,5 +161,6 @@ plot_value_function(q10k)
 q50k = monte_carlo_control(50000)
 plot_value_function(q50k)
 '''
-q500k = monte_carlo_control(500000)
+#q500k = monte_carlo_control(500000)
+q500k = sarsa_control(500000)
 plot_value_function(q500k)

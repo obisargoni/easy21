@@ -16,6 +16,7 @@ def epsilon_greedy_action(q,n,s):
 	'''
 
 	# Set epsilon - updated each time n[s] changes
+	# This is GLIE, since epsilon decays as n[s] increases, number of times a state has been visited increases
 	e = 100/(100 + n[s].sum())
 
 	if random.random()<=e:
@@ -46,6 +47,7 @@ def mc_play_game(q, n, k):
 
 	# get action, record state
 	while card_table.is_state_terminal == False:
+
 		a = epsilon_greedy_action(q,n,s,k)
 		sa = s + (a,)
 		state_actions_visited.append(sa)
@@ -80,56 +82,61 @@ def monte_carlo_control(n_iters):
 
 	return q
 
-def sarsa_play_game(table, q, n):
+def sarsa_play_game(table, sa, q, n, elig, gamma):
 	'''Perform a single action and update teh state-action value function towards the estimated value using one step lookahead.
 	Update the policy
 	'''
 
-	gamma = 0.1
+	if sa == None:
+		# Initialise state-action value
+		s = table.state
+		s = (s[0]-1, s[1]-1)
+		a = epsilon_greedy_action(q,n,s)
+		sa = s + (a,)
 
-	# State is (agent hand, dealer hand)
-	s = table.state
-
-	# Adjust sate so that it matches with 0 indexed indices of ndarrays
-	s = (s[0]-1, s[1]-1)
-
-	# get action, record state
-	a = epsilon_greedy_action(q,n,s)
-	sa = s + (a,)
+	# Update eligibility trace for this state-action
+	elig[sa] += 1
+	n[sa] += 1
 
 	# Take action, get new state and reward
 	s_, r = table.step(a)
 	s_ = (s_[0]-1, s_[1]-1)
 
-	# Need to get a_, action under this or previous policy?
+	# Sample actions. Gives a_, next action under this policy.
 	# Use this policy since that is the action we would expect to take (haven't updated policy yet either)
 	a_ = epsilon_greedy_action(q,n,s_)
 	sa_ = s_ + (a_,)
 
 	# Update value function using rewards and estimate of value function of next state-action 
-	n[sa] += 1
 	alpha = (1/float(n[sa]))
-	q[sa] += alpha*(r + gamma*q[sa_] - q[sa])
+	td_target = r + gamma*q[sa_] - q[sa]
 	
-	return q, n
+	# Update state-action value function in proportion to eligibility traces
+	q = q + alpha*td_target*elig
+	
+	return sa_, q, n, elig
 
-def sarsa_control(n_iters):
+def sarsa_control(n_iters, lam):
+
+	gamma = 0.1
+
 	# State space is agent hand x dealer hand x agent actions (22 x 10 x 2)
-	q = np.zeros([21,10,2])
-	n = np.zeros([21,10,2])
-
-	# Episode number
-	k = 0
-
-	state_actions_visited = []
-	game_reward = 0
-
-	# Initialise a new game
-	card_table = Environment()
+	state_space_size = [21,10,2]
+	q = np.zeros(state_space_size)
+	n = np.zeros(state_space_size)
 
 	for i in range(n_iters):
+		# Initialise a new game and eligibility trace
+		card_table = Environment()
+		elig = np.zeros(state_space_size)
+		sa = None
+
 		while card_table.is_state_terminal == False:
-			q,n = sarsa_play_game(card_table, q, n)
+			sa,q,n,elig = sarsa_play_game(card_table, sa, q, n, elig, gamma)
+
+			# decay eligibility trace
+			elig = gamma * lam * elig
+
 	return q
 
 
@@ -162,5 +169,5 @@ q50k = monte_carlo_control(50000)
 plot_value_function(q50k)
 '''
 #q500k = monte_carlo_control(500000)
-q500k = sarsa_control(500000)
+q500k = sarsa_control(500000, 0.1)
 plot_value_function(q500k)

@@ -16,6 +16,7 @@ def epsilon_greedy_action(q,n,s):
 	'''
 
 	# Set epsilon - updated each time n[s] changes
+	# This is GLIE, since epsilon decays as n[s] increases, number of times a state has been visited increases
 	e = 100/(100 + n[s].sum())
 
 	if random.random()<=e:

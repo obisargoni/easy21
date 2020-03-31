@@ -93,7 +93,7 @@ def sarsa_play_game(table, q, n):
 	# Adjust sate so that it matches with 0 indexed indices of ndarrays
 	s = (s[0]-1, s[1]-1)
 
-	# get action, record state
+	# get action, record state-action
 	a = epsilon_greedy_action(q,n,s)
 	sa = s + (a,)
 
@@ -101,15 +101,20 @@ def sarsa_play_game(table, q, n):
 	s_, r = table.step(a)
 	s_ = (s_[0]-1, s_[1]-1)
 
-	# Need to get a_, action under this or previous policy?
-	# Use this policy since that is the action we would expect to take (haven't updated policy yet either)
-	a_ = epsilon_greedy_action(q,n,s_)
-	sa_ = s_ + (a_,)
+	# Now sample expected future reward from the state agent has arrived in
+	if table.is_state_terminal:
+		expeced_reward = 0
+	else:
+		# Need to get a_, action under this or previous policy?
+		# Use this policy since that is the action we would expect to take (haven't updated policy yet either)
+		a_ = epsilon_greedy_action(q,n,s_)
+		sa_ = s_ + (a_,)
+		expeced_reward = q[sa_]
 
 	# Update value function using rewards and estimate of value function of next state-action 
 	n[sa] += 1
 	alpha = (1/float(n[sa]))
-	q[sa] += alpha*(r + gamma*q[sa_] - q[sa])
+	q[sa] += alpha*(r + gamma*expeced_reward - q[sa])
 	
 	return q, n
 

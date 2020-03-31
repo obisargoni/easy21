@@ -131,11 +131,6 @@ def sarsa_control(n_iters, lam):
 	q = np.zeros(state_space_size)
 	n = np.zeros(state_space_size)
 
-	# Episode number
-	k = 0
-
-	state_actions_visited = []
-	game_reward = 0
 
 	for i in range(n_iters):
 		# Initialise a new game

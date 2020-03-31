@@ -129,10 +129,9 @@ def sarsa_control(n_iters):
 	state_actions_visited = []
 	game_reward = 0
 
-	# Initialise a new game
-	card_table = Environment()
-
 	for i in range(n_iters):
+		# Initialise a new game
+		card_table = Environment()
 		while card_table.is_state_terminal == False:
 			q,n = sarsa_play_game(card_table, q, n)
 	return q

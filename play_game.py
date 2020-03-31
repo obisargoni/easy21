@@ -80,7 +80,7 @@ def monte_carlo_control(n_iters):
 
 	return q
 
-def sarsa_play_game(table, q, n):
+def sarsa_play_game(table, q, n, E, lam):
 	'''Perform a single action and update the state-action value function towards the estimated value using one step lookahead.
 	Update the policy
 	'''
@@ -111,14 +111,21 @@ def sarsa_play_game(table, q, n):
 		sa_ = s_ + (a_,)
 		expeced_reward = q[sa_]
 
-	# Update value function using rewards and estimate of value function of next state-action 
+	# Update number of times states visited
 	n[sa] += 1
 	alpha = (1/float(n[sa]))
-	q[sa] += alpha*(r + gamma*expeced_reward - q[sa])
-	
-	return q, n
 
-def sarsa_control(n_iters):
+	# Update eligibility trace
+	E = gamma * lam * E
+	E[sa] += 1
+
+	# Perform backwards view update
+	td_error = r + gamma*expeced_reward - q[sa]
+	q += alpha*td_error*E
+	
+	return q, n, E
+
+def sarsa_control(n_iters, lam):
 	# State space is agent hand x dealer hand x agent actions (22 x 10 x 2)
 	q = np.zeros([21,10,2])
 	n = np.zeros([21,10,2])
@@ -133,7 +140,9 @@ def sarsa_control(n_iters):
 		# Initialise a new game
 		card_table = Environment()
 		while card_table.is_state_terminal == False:
-			q,n = sarsa_play_game(card_table, q, n)
+			# Initialise eligibility trace
+			E = np.zeros(q.shape)
+			q,n,E = sarsa_play_game(card_table, q, n, E, lam)
 	return q
 
 

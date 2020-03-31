@@ -174,6 +174,25 @@ plot_value_function(q10k)
 q50k = monte_carlo_control(50000)
 plot_value_function(q50k)
 '''
-#q500k = monte_carlo_control(500000)
-q500k = sarsa_control(500000)
+# Estiamte true value function using MC
+q500k = monte_carlo_control(500000)
+
+# See how sarsa-lambda compares for different values of lambda
+sarsa_iter = 1000
+results = []
+lambda_values = np.arange(0,1,0.1)
+for lam in lambda_values:
+	q = sarsa_control(sarsa_iter, lam)
+	results.append(q)
+
+# Compute mean squared error between each and the estimated true value
+def mse(q1,q2):
+	return ((q1-q2)*2).mean()
+
+errors = [mse(q_sarsa, q500k) for q_sarsa in results]
+
+# PLot results
+plt.scatter(lambda_values, errors)
+plt.show()
+
 plot_value_function(q500k)

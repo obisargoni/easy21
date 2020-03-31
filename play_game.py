@@ -127,8 +127,9 @@ def sarsa_play_game(table, q, n, E, lam):
 
 def sarsa_control(n_iters, lam):
 	# State space is agent hand x dealer hand x agent actions (22 x 10 x 2)
-	q = np.zeros([21,10,2])
-	n = np.zeros([21,10,2])
+	state_space_size = [21,10,2]
+	q = np.zeros(state_space_size)
+	n = np.zeros(state_space_size)
 
 	# Episode number
 	k = 0
@@ -139,9 +140,10 @@ def sarsa_control(n_iters, lam):
 	for i in range(n_iters):
 		# Initialise a new game
 		card_table = Environment()
+
+		# Initialise eligibility trace
+		E = np.zeros(state_space_size)
 		while card_table.is_state_terminal == False:
-			# Initialise eligibility trace
-			E = np.zeros(q.shape)
 			q,n,E = sarsa_play_game(card_table, q, n, E, lam)
 	return q
 

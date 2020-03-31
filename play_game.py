@@ -81,7 +81,7 @@ def monte_carlo_control(n_iters):
 	return q
 
 def sarsa_play_game(table, q, n):
-	'''Perform a single action and update teh state-action value function towards the estimated value using one step lookahead.
+	'''Perform a single action and update the state-action value function towards the estimated value using one step lookahead.
 	Update the policy
 	'''
 

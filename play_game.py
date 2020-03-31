@@ -46,7 +46,7 @@ def mc_play_game(q, n, k):
 
 	# get action, record state
 	while card_table.is_state_terminal == False:
-		a = epsilon_greedy_action(q,n,s,k)
+		a = epsilon_greedy_action(q,n,s)
 		sa = s + (a,)
 		state_actions_visited.append(sa)
 

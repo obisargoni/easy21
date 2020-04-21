@@ -237,7 +237,8 @@ plot_value_function(q50k)
 mc_agent_500k = train_mc_agent(500000)
 plot_value_function(mc_agent_500k.q)
 
-'''
+q500k = mc_agent_500k.q
+
 # See how sarsa-lambda compares for different values of lambda
 sarsa_iter = 1000
 results = []
@@ -253,7 +254,24 @@ plt.figure()
 plt.scatter(lambda_values, errors)
 plt.show()
 
+# See how sarsa-lambda compares for different values of lambda
+sarsa_iter = 1000
+results = []
+lambda_values = np.arange(0,1,0.1)
+for lam in lambda_values:
+    trained_sarsa_agent = train_sarsa_lam_agent(sarsa_iter, lam)
+    results.append(trained_sarsa_agent.q)
+
+errors = [mse(q_sarsa, q500k) for q_sarsa in results]
+
+# PLot results - they don't show much of a pattern
+plt.figure()
+plt.scatter(lambda_values, errors)
+plt.show()
+
+
 # Get learning curve results - lambda = 0 seems to learn faster. would you expect this for this game?
+'''
 results = sarsa_lambda_control(sarsa_iter, 0, results_to_return = 'all')
 errs = [mse(i, q500k) for i in results]
 iter_number =list(range(sarsa_iter))
@@ -267,6 +285,5 @@ iter_number =list(range(sarsa_iter))
 plt.figure()
 plt.scatter(iter_number, errs)
 plt.show()
-
-plot_value_function(q500k)
 '''
+plot_value_function(q500k)

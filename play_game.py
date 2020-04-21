@@ -54,7 +54,7 @@ def train_mc_agent(n_iters):
             s = (s[0]-1, s[1]-1)
 
             # agent takes action, gets reward
-            a = mc_agent.epsilon_greedy_action(s)
+            a = mc_agent.choose_action(s)
 
             sa = s + (a,)
             state_actions_visited.append(sa)
@@ -133,8 +133,8 @@ def train_sarsa_agent(n_iters):
             s = (s[0]-1, s[1]-1)
 
             # agent takes action, gets reward
-            a = sarsa_agent.epsilon_greedy_action(s)
-            s_, r = table.step(a)
+            a = sarsa_agent.choose_action(s)
+            s_, r = card_table.step(a)
             s_ = (s_[0]-1, s_[1]-1)
 
             sarsa_agent.update_value_function(s,a,r,s_)

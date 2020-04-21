@@ -48,6 +48,12 @@ class mc():
             # Choose greedy
             a = self._q[s].argmax()
 
+        return a
+
+    def choose_action(self, s):
+
+        a = self.epsilon_greedy_action(s)
+
         # Record how many times this state-action pair visited
         sa = s +(a,)
         self._ne[sa] += 1
@@ -115,6 +121,12 @@ class sarsa():
             # Choose greedy
             a = self._q[s].argmax()
         
+        return a
+
+    def choose_action(self, s):
+
+        a = self.epsilon_greedy_action(s)
+
         # Record how many times this state-action pair visited
         sa = s +(a,)
         self._n[sa] += 1

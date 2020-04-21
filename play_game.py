@@ -101,7 +101,8 @@ def sarsa_play_game(table, q, n, E, lam):
 
     # Update number of times states visited
     n[sa] += 1
-    alpha = (1/float(n[sa]))
+
+    alpha = np.divide(1, n, out=np.zeros_like(n), where=n!=0)
 
     # Update eligibility trace
     E = gamma * lam * E

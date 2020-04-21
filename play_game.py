@@ -143,6 +143,36 @@ def train_sarsa_agent(n_iters):
     # Return the trained agent
     return sarsa_agent
 
+def train_sarsa_lam_agent(n_iters, lam):
+
+    # State space is agent hand x dealer hand x agent actions (22 x 22 x 2)
+    state_space_size = [22,22,2]
+
+    # initialise sarsa agent
+    sarsa_agent = sarsa_lam(state_space_size, lam, gamma = 0.1)  
+
+    # Train agent
+    for i in range(n_iters):
+        # initialise the environment
+        card_table = Environment()
+
+        # game ends when terminal state is reached
+        while card_table.is_state_terminal == False:
+            s = card_table.state
+            # Adjust sate so that it matches with 0 indexed indices of ndarrays
+            s = (s[0]-1, s[1]-1)
+
+            # agent takes action, gets reward
+            a = sarsa_agent.choose_action(s)
+            s_, r = card_table.step(a)
+            s_ = (s_[0]-1, s_[1]-1)
+
+            sarsa_agent.update_value_function(s,a,r,s_)
+        sarsa_agent.reset_eligibility_trace()
+
+    # Return the trained agent
+    return sarsa_agent
+
 
 
 def sarsa_lambda_control(n_iters, lam, results_to_return = 'final'):

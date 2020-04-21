@@ -12,7 +12,7 @@ class mc():
     # Reward discount factor
     _gamma = None
 
-    # Value function, number of times states visited, number of times states visited this epoch
+    # Value function, number of times states visited, number of times states visited this episode
     _q = None
     _n = None
     _ne = None
@@ -66,19 +66,20 @@ class mc():
         game_reward: the total reward accumulated through the game
         '''
 
+        # Update th total number of times each state visited with numbers from this episode
         self._n += self._ne
-
-        # 1 for all states visited since last update 0 otherwise
-        mask_ne = (self._ne > 0).astype(int)
-        
-        # Reset states visited since last update
-        self._ne = np.zeros(self._ne.shape)
 
         # alhpa controls how much to increment the value function value for each state by, according to number of times those states visited
         alpha = np.divide(1, self._n, out=np.zeros_like(self._n), where=self._n!=0)
 
+        # 1 for all states visited since last update 0 otherwise
+        mask_ne = (self._ne > 0).astype(int)
+
         # Update value function for sates visited since last update (these are the states that have lead to this reward)
         self._q += (game_reward - self._q)*alpha*mask_ne
+
+        # Reset states visited since last update
+        self._ne = np.zeros(self._ne.shape)
 
         return None
 

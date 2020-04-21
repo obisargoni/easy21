@@ -162,4 +162,93 @@ class sarsa():
         return None
 
 
+class sarsa_lam():
     
+    # Reward discount factor
+    _gamma = None
+
+    # Value function, number of times states visited, eligibility trace
+    _q = None
+    _n = None
+    _E = None
+
+    # lambda, use to calculate eligibility trace
+    _lam = None
+
+    def __init__(self, state_space_size, lam, gamma = 0.1):
+        self._q = np.zeros(state_space_size)
+        self._n = np.zeros(state_space_size)
+        self._E = np.zeros(state_space_size)
+        self._gamma = gamma
+        self._lam = lam
+
+    @property
+    def q(self):
+        return self._q
+    
+    @property
+    def n(self):
+        return self._n
+
+    def reset_eligibility_trace(self):
+        self._E = np.zeros(self._E.shape)
+
+    def epsilon_greedy_action(self, s):
+        '''Impliment e-greedy action choice. Based on current state, action value function, and number of elapsed episodes
+        make an e-greedy action choice. In this way, the agent policy is updated.
+        '''
+
+        # Set epsilon - updated each time n[s] changes
+        # This is GLIE, since epsilon decays as n[s] increases, number of times a state has been visited increases
+        e = 100/(100 + self._n[s].sum())
+
+        if random.random()<=e:
+            # Choose random action
+            a = random.choice(np.arange(self._q[s].size))
+        else:
+            # Choose greedy
+            a = self._q[s].argmax()
+        
+        return a
+
+    def choose_action(self, s):
+
+        a = self.epsilon_greedy_action(s)
+
+        # Record how many times this state-action pair visited
+        sa = s +(a,)
+        self._n[sa] += 1
+        return a
+
+
+    def update_value_function(self,s,a,r,s_):
+        '''Update the agents value function based on the state the agent was in, the action the agent took, and the reward the agent received
+
+        s: the state the agent was in
+        a: the action the agent took
+        r: the reward the agent received
+        s_: the new state of the system
+        '''
+
+        # Not sure how to check if state is terminal here            
+        # Need to get a_, action under this or previous policy?
+        # Use this policy since that is the action we would expect to take (haven't updated policy yet either)
+        a_ = self.choose_action(s_)
+        sa_ = s_ + (a_,)
+        expeced_reward = self._q[sa_]
+
+        sa = s + (a,)
+
+        # Update number of times states visited
+        alpha = np.divide(1, self._n, out=np.zeros_like(self._n), where=self._n!=0)
+
+        # Update eligibility trace
+        self._E = self._gamma * self._lam * self._E
+        self._E[sa] += 1
+
+        # Perform backwards view update - is mask needed here?
+        td_error = r + self._gamma*expeced_reward - self._q[sa]
+        self._q += alpha*td_error*self._E
+
+        return None
+

@@ -154,21 +154,6 @@ sarsa_iter = 1000
 results = []
 lambda_values = np.arange(0,1,0.1)
 for lam in lambda_values:
-    q = sarsa_lambda_control(sarsa_iter, lam)[-1]
-    results.append(q)
-
-errors = [mse(q_sarsa, q500k) for q_sarsa in results]
-
-# PLot results - they don't show much of a pattern
-plt.figure()
-plt.scatter(lambda_values, errors)
-plt.show()
-
-# See how sarsa-lambda compares for different values of lambda
-sarsa_iter = 1000
-results = []
-lambda_values = np.arange(0,1,0.1)
-for lam in lambda_values:
     trained_sarsa_agent = train_sarsa_lam_agent(sarsa_iter, lam)
     results.append(trained_sarsa_agent.q)
 

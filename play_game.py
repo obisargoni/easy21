@@ -4,7 +4,7 @@ import pandas as pd
 import random
 from Environment import Environment
 
-from Agents import sarsa, mc
+from Agents import sarsa, mc, sarsa_lam
 
 import matplotlib as mpl
 from matplotlib import cm

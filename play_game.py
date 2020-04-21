@@ -15,24 +15,6 @@ import matplotlib.pyplot as plt
 intermediate_results = None
 
 
-def epsilon_greedy_action(q,n,s):
-    '''Impliment e-greedy action choice. Based on current state, action value function, and number of elapsed episodes
-    make an e-greedy action choice. In this way, the agent policy is updated.
-    '''
-
-    # Set epsilon - updated each time n[s] changes
-    # This is GLIE, since epsilon decays as n[s] increases, number of times a state has been visited increases
-    e = 100/(100 + n[s].sum())
-
-    if random.random()<=e:
-        # Choose random action
-        a = random.choice(np.arange(q[s].size))
-    else:
-        # Choose greedy
-        a = q[s].argmax()
-
-    return a
-
 def train_mc_agent(n_iters):
 
     # State space is agent hand x dealer hand x agent actions (22 x 22 x 2)
@@ -67,52 +49,6 @@ def train_mc_agent(n_iters):
 
     return mc_agent
 
-
-def sarsa_play_game(table, q, n, E, lam):
-    '''Perform a single action and update the state-action value function towards the estimated value using one step lookahead.
-    Update the policy
-    '''
-
-    gamma = 0.1
-
-    # State is (agent hand, dealer hand)
-    s = table.state
-
-    # Adjust sate so that it matches with 0 indexed indices of ndarrays
-    s = (s[0]-1, s[1]-1)
-
-    # get action, record state-action
-    a = epsilon_greedy_action(q,n,s)
-    sa = s + (a,)
-
-    # Take action, get new state and reward
-    s_, r = table.step(a)
-    s_ = (s_[0]-1, s_[1]-1)
-
-    # Now sample expected future reward from the state agent has arrived in
-    if table.is_state_terminal:
-        expeced_reward = 0
-    else:
-        # Need to get a_, action under this or previous policy?
-        # Use this policy since that is the action we would expect to take (haven't updated policy yet either)
-        a_ = epsilon_greedy_action(q,n,s_)
-        sa_ = s_ + (a_,)
-        expeced_reward = q[sa_]
-
-    # Update number of times states visited
-    n[sa] += 1
-
-    alpha = np.divide(1, n, out=np.zeros_like(n), where=n!=0)
-
-    # Update eligibility trace
-    E = gamma * lam * E
-    E[sa] += 1
-
-    # Perform backwards view update
-    td_error = r + gamma*expeced_reward - q[sa]
-    q += alpha*td_error*E
-    
-    return q, n, E
 
 def train_sarsa_agent(n_iters):
 
@@ -173,32 +109,6 @@ def train_sarsa_lam_agent(n_iters, lam):
     # Return the trained agent
     return sarsa_agent
 
-
-
-def sarsa_lambda_control(n_iters, lam, results_to_return = 'final'):
-    # State space is agent hand x dealer hand x agent actions (22 x 10 x 2)
-    state_space_size = [22,22,2]
-    q = np.zeros(state_space_size)
-    n = np.zeros(state_space_size)
-
-    results = []
-
-    for i in range(n_iters):
-        # Initialise a new game
-        card_table = Environment()
-
-        if results_to_return == 'all':
-            results.append(q.copy())
-
-        # Initialise eligibility trace for each episode
-        E = np.zeros(state_space_size)
-        while card_table.is_state_terminal == False:
-            q,n,E = sarsa_play_game(card_table, q, n, E, lam)
-    
-    # Include final result
-    if len(results) == 0:
-        results.append(q)
-    return results
 
 
 def plot_value_function(q):

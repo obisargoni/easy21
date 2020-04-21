@@ -35,8 +35,8 @@ def epsilon_greedy_action(q,n,s):
 
 def train_mc_agent(n_iters):
 
-    # State space is agent hand x dealer hand x agent actions (22 x 10 x 2)
-    state_space_size = [21,10,2]
+    # State space is agent hand x dealer hand x agent actions (22 x 22 x 2)
+    state_space_size = [22,22,2]
 
     mc_agent = mc(state_space_size)
     
@@ -49,7 +49,8 @@ def train_mc_agent(n_iters):
         state_actions_visited = []
         while card_table.is_state_terminal == False:
             s = card_table.state
-            # Adjust sate so that it matches with 0 indexed indices of ndarrays
+
+            # Adjust state so that it matches with 0 indexed indices of ndarrays
             s = (s[0]-1, s[1]-1)
 
             # agent takes action, gets reward
@@ -114,8 +115,8 @@ def sarsa_play_game(table, q, n, E, lam):
 
 def train_sarsa_agent(n_iters):
 
-    # State space is agent hand x dealer hand x agent actions (22 x 10 x 2)
-    state_space_size = [21,10,2]
+    # State space is agent hand x dealer hand x agent actions (22 x 22 x 2)
+    state_space_size = [22,22,2]
 
     # initialise sarsa agent
     sarsa_agent = sarsa(state_space_size, gamma = 0.1)  
@@ -145,7 +146,7 @@ def train_sarsa_agent(n_iters):
 
 def sarsa_lambda_control(n_iters, lam, results_to_return = 'final'):
     # State space is agent hand x dealer hand x agent actions (22 x 10 x 2)
-    state_space_size = [21,10,2]
+    state_space_size = [22,22,2]
     q = np.zeros(state_space_size)
     n = np.zeros(state_space_size)
 
@@ -180,7 +181,7 @@ def plot_value_function(q):
     v = np.average(q, axis = 2)
 
     # Select just the states we are interested in plotting
-    z = v[11:,:]
+    z = v[11:21,0:10]
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')

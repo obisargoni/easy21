@@ -34,7 +34,10 @@ class Environment():
 
     @property
     def state(self):
-        return (self.agent_hand, self.dealer_hand)
+        # Limit agent and dealer hands to max 22, since at this value or above they go bust
+        ah = min(self.agent_hand, 22)
+        dh = min(self.dealer_hand, 22)
+        return (ah, dh)
     
 
     def step(self, a):

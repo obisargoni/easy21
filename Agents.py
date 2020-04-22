@@ -162,7 +162,7 @@ class sarsa():
         return None
 
 
-class sarsa_lam():
+class sarsaL():
     
     # Reward discount factor
     _gamma = None

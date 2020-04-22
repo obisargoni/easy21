@@ -4,7 +4,7 @@ import pandas as pd
 import random
 from Environment import Environment
 
-from Agents import sarsa, mc, sarsa_lam
+from Agents import sarsa, mc, sarsaL
 
 import matplotlib as mpl
 from matplotlib import cm
@@ -79,13 +79,13 @@ def train_sarsa_agent(n_iters):
     # Return the trained agent
     return sarsa_agent
 
-def train_sarsa_lam_agent(n_iters, lam):
+def train_sarsaL_agent(n_iters, lam):
 
     # State space is agent hand x dealer hand x agent actions (22 x 22 x 2)
     state_space_size = [22,22,2]
 
     # initialise sarsa agent
-    sarsa_agent = sarsa_lam(state_space_size, lam, gamma = 0.1)  
+    sarsa_agent = sarsaL(state_space_size, lam, gamma = 0.1)  
 
     # Train agent
     for i in range(n_iters):
@@ -108,8 +108,6 @@ def train_sarsa_lam_agent(n_iters, lam):
 
     # Return the trained agent
     return sarsa_agent
-
-
 
 def plot_value_function(q):
     # Plot values
@@ -154,7 +152,7 @@ sarsa_iter = 1000
 results = []
 lambda_values = np.arange(0,1,0.1)
 for lam in lambda_values:
-    trained_sarsa_agent = train_sarsa_lam_agent(sarsa_iter, lam)
+    trained_sarsa_agent = train_sarsaL_agent(sarsa_iter, lam)
     results.append(trained_sarsa_agent.q)
 
 errors = [mse(q_sarsa, q500k) for q_sarsa in results]

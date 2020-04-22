@@ -143,9 +143,8 @@ plot_value_function(q50k)
 '''
 
 mc_agent_500k = train_mc_agent(500000)
-plot_value_function(mc_agent_500k.q)
-
 q500k = mc_agent_500k.q
+plot_value_function(q500k)
 
 # See how sarsa-lambda compares for different values of lambda
 sarsa_iter = 1000
@@ -179,4 +178,4 @@ plt.figure()
 plt.scatter(iter_number, errs)
 plt.show()
 '''
-plot_value_function(q500k)
+

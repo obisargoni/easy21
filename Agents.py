@@ -163,6 +163,8 @@ class sarsa():
 
 
 class sarsaL():
+
+    _sss = None
     
     # Reward discount factor
     _gamma = None
@@ -176,9 +178,9 @@ class sarsaL():
     _lam = None
 
     def __init__(self, state_space_size, lam, gamma = 0.1):
-        self._q = np.zeros(state_space_size)
-        self._n = np.zeros(state_space_size)
-        self._E = np.zeros(state_space_size)
+        self._sss = state_space_size
+        self._q = np.zeros(self._sss)
+        self._n = np.zeros(self._sss)
         self._gamma = gamma
         self._lam = lam
 
@@ -190,8 +192,8 @@ class sarsaL():
     def n(self):
         return self._n
 
-    def reset_eligibility_trace(self):
-        self._E = np.zeros(self._E.shape)
+    def init_etrace(self):
+        self._E = np.zeros(self._sss)
 
     def epsilon_greedy_action(self, s):
         '''Impliment e-greedy action choice. Based on current state, action value function, and number of elapsed episodes

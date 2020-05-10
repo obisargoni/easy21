@@ -9,18 +9,13 @@ class mc():
     '''Use monte carlo learning to learn value function
     '''
 
-    # Reward discount factor
-    _gamma = None
-
-    # Value function, number of times states visited, number of times states visited this episode
-    _q = None
-    _n = None
-    _ne = None
-
     def __init__(self, state_space_size, gamma = 0.1):
+        # Value function, number of times states visited, number of times states visited this episode
         self._q = np.zeros(state_space_size)
         self._n = np.zeros(state_space_size)
         self._ne = np.zeros(state_space_size)
+
+        # Reward discount factor
         self._gamma = gamma
 
 
@@ -85,17 +80,14 @@ class mc():
 
 
 class sarsa():
-    
-    # Reward discount factor
-    _gamma = None
-
-    # Value function, number of times states visited
-    _q = None
-    _n = None
 
     def __init__(self, state_space_size, gamma = 0.1):
+
+        # Value function, number of times states visited
         self._q = np.zeros(state_space_size)
         self._n = np.zeros(state_space_size)
+
+        # Reward discount factor
         self._gamma = gamma
 
     @property
@@ -164,24 +156,17 @@ class sarsa():
 
 class sarsaL():
 
-    _sss = None
-    
-    # Reward discount factor
-    _gamma = None
-
-    # Value function, number of times states visited, eligibility trace
-    _q = None
-    _n = None
-    _E = None
-
-    # lambda, use to calculate eligibility trace
-    _lam = None
-
     def __init__(self, state_space_size, lam, gamma = 0.1):
         self._sss = state_space_size
+
+        # Value function, number of times states visited, eligibility trace
         self._q = np.zeros(self._sss)
         self._n = np.zeros(self._sss)
+
+         # Reward discount factor
         self._gamma = gamma
+
+        # lambda, use to calculate eligibility trace
         self._lam = lam
 
     @property

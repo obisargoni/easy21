@@ -134,13 +134,6 @@ def plot_value_function(q):
 def mse(q1,q2):
     return ((q1-q2)*2).mean()
 
-'''
-q10k = monte_carlo_control(10000)
-plot_value_function(q10k)
-
-q50k = monte_carlo_control(50000)
-plot_value_function(q50k)
-'''
 
 mc_agent_500k = train_mc_agent(500000)
 q500k = mc_agent_500k.q

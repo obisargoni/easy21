@@ -167,19 +167,9 @@ plt.show()
 
 
 # Get learning curve results - lambda = 0 seems to learn faster. would you expect this for this game?
-'''
-results = sarsa_lambda_control(sarsa_iter, 0, results_to_return = 'all')
-errs = [mse(i, q500k) for i in results]
-iter_number =list(range(sarsa_iter))
-plt.figure()
-plt.scatter(iter_number, errs)
-plt.show()
-
-results1 = sarsa_lambda_control(sarsa_iter, 1, results_to_return = 'all')
-errs = [mse(i, q500k) for i in results1]
-iter_number =list(range(sarsa_iter))
-plt.figure()
-plt.scatter(iter_number, errs)
-plt.show()
-'''
-
+for log in (training_log[0], training_log[-1]):
+    errs = [mse(i, q500k) for i in log]
+    iter_number =list(range(len(log)))
+    plt.figure()
+    plt.scatter(iter_number, errs)
+    plt.show()

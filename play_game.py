@@ -79,13 +79,14 @@ def train_sarsa_agent(n_iters):
     # Return the trained agent
     return sarsa_agent
 
-def train_sarsaL_agent(n_iters, lam):
+def train_sarsaL_agent(n_iters, lam, record_history = False):
 
     # State space is agent hand x dealer hand x agent actions (22 x 22 x 2)
     state_space_size = [22,22,2]
 
     # initialise sarsa agent
-    sarsa_agent = sarsaL(state_space_size, lam, gamma = 0.1)  
+    sarsa_agent = sarsaL(state_space_size, lam, gamma = 0.1)
+
 
     # Train agent
     for i in range(n_iters):
@@ -105,6 +106,9 @@ def train_sarsaL_agent(n_iters, lam):
             s_ = (s_[0]-1, s_[1]-1)
 
             sarsa_agent.update_value_function(s,a,r,s_)
+
+        if record_history:
+            sarsa_agent.log_value_function()
 
     # Return the trained agent
     return sarsa_agent
@@ -142,10 +146,17 @@ plot_value_function(q500k)
 # See how sarsa-lambda compares for different values of lambda
 sarsa_iter = 1000
 results = []
-lambda_values = np.arange(0,1,0.1)
+training_log = []
+lambda_values = np.arange(0,1.1,0.1)
 for lam in lambda_values:
-    trained_sarsa_agent = train_sarsaL_agent(sarsa_iter, lam)
+    if lam in [0, 1.0]:
+        record_history = True
+    else:
+        record_history = False
+
+    trained_sarsa_agent = train_sarsaL_agent(sarsa_iter, lam, record_history)
     results.append(trained_sarsa_agent.q)
+    training_log.append(trained_sarsa_agent.log)
 
 errors = [mse(q_sarsa, q500k) for q_sarsa in results]
 

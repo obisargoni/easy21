@@ -220,7 +220,7 @@ class sarsaL():
         # Not sure how to check if state is terminal here            
         # Need to get a_, action under this or previous policy?
         # Use this policy since that is the action we would expect to take (haven't updated policy yet either)
-        a_ = self.choose_action(s_)
+        a_ = self.epsilon_greedy_action(s_)
         sa_ = s_ + (a_,)
         expeced_reward = self._q[sa_]
 

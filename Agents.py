@@ -169,6 +169,9 @@ class sarsaL():
         # lambda, use to calculate eligibility trace
         self._lam = lam
 
+        # Log, used to record value functions during training
+        self._log = []
+
     @property
     def q(self):
         return self._q
@@ -176,6 +179,11 @@ class sarsaL():
     @property
     def n(self):
         return self._n
+
+    @property
+    def log(self):
+        return self._log
+    
 
     def init_etrace(self):
         self._E = np.zeros(self._sss)
@@ -207,7 +215,6 @@ class sarsaL():
         self._n[sa] += 1
         return a
 
-
     def update_value_function(self,s,a,r,s_):
         '''Update the agents value function based on the state the agent was in, the action the agent took, and the reward the agent received
 
@@ -238,4 +245,7 @@ class sarsaL():
         self._q += alpha*td_error*self._E
 
         return None
+
+    def log_value_function(self):
+        self._log.append(self._q.copy())
 

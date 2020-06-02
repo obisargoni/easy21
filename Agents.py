@@ -147,7 +147,7 @@ class sarsa():
         # Update number of times states visited
         alpha = (1/float(self._n[sa]))
 
-        # Perform backwards view update - is mask needed here?
+        # Perform backwards view update
         td_error = r + self._gamma*expeced_reward - self._q[sa]
         self._q[sa] += alpha*td_error
 

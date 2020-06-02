@@ -156,7 +156,7 @@ class sarsa():
 
 class sarsaL():
 
-    def __init__(self, state_space_size, lam, gamma = 0.1):
+    def __init__(self, state_space_size, lam, gamma = 1):
         self._sss = state_space_size
 
         # Value function, number of times states visited, eligibility trace

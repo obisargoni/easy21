@@ -136,7 +136,8 @@ def plot_value_function(q):
 
 # Compute mean squared error between each and the estimated true value
 def mse(q1,q2):
-    return ((q1-q2)*2).mean()
+    return (np.square(q1-q2)).mean()
+
 
 
 mc_agent_500k = train_mc_agent(500000)

@@ -18,7 +18,7 @@ intermediate_results = None
 def train_mc_agent(n_iters):
 
     # State space is agent hand x dealer hand x agent actions (22 x 22 x 2)
-    state_space_size = [22,22,2]
+    state_space_size = [22,10,2]
 
     mc_agent = mc(state_space_size)
     
@@ -53,7 +53,7 @@ def train_mc_agent(n_iters):
 def train_sarsa_agent(n_iters):
 
     # State space is agent hand x dealer hand x agent actions (22 x 22 x 2)
-    state_space_size = [22,22,2]
+    state_space_size = [22,10,2]
 
     # initialise sarsa agent
     sarsa_agent = sarsa(state_space_size, gamma = 0.1)  
@@ -82,7 +82,7 @@ def train_sarsa_agent(n_iters):
 def train_sarsaL_agent(n_iters, lam, record_history = False):
 
     # State space is agent hand x dealer hand x agent actions (22 x 22 x 2)
-    state_space_size = [22,22,2]
+    state_space_size = [22,10,2]
 
     # initialise sarsa agent
     sarsa_agent = sarsaL(state_space_size, lam, gamma = 1)

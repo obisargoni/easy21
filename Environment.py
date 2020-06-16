@@ -34,9 +34,9 @@ class Environment():
 
     @property
     def state(self):
-        # Limit agent and dealer hands to max 22, since at this value or above they go bust
+        # Limit agent and dealer hands to max 22, since at this value or above they go bust. Similarly limit dealer hand to 10 since this is all agent sees.
         ah = min(self.agent_hand, 22)
-        dh = min(self.dealer_hand, 22)
+        dh = min(self.dealer_hand, 10)
         return (ah, dh)
     
 
@@ -78,16 +78,16 @@ class Environment():
                 # Draw card for agent
                 self._agent_hand += self._deck.draw()
 
+            self._terminal = self.isTerminal()
+            r = self.reward()
             s = self.state
-            self._terminal = self.isTerminal(self.state)
-            r = self.reward(s)
             
             return (s,r)
 
 
 
 
-    def reward(self, s):
+    def reward(self):
         '''
         Calculate the reward of a state.
 
@@ -99,14 +99,15 @@ class Environment():
 
         NEEDS WORK, QUITE MESSY
         '''
-        ah, dh = s
+        ah = self.agent_hand
+        dh = self.dealer_hand
 
         if self._terminal == False:
             return 0
 
         if (ah > 21) | (ah < 1):
             r = -1
-        elif (dh > 21):
+        elif (dh > 21) | (dh < 1):
             r = 1
         elif (dh > ah):
             r = -1
@@ -118,12 +119,13 @@ class Environment():
         return r
 
 
-    def isTerminal(self, s):
+    def isTerminal(self):
         '''
         '''
-        ah, dh = s
+        ah = self.agent_hand
+        dh = self.dealer_hand
 
-        if (ah > 21) | (ah < 1) | (dh >= 17):
+        if (ah > 21) | (ah < 1) | (dh > 16) | (dh < 1):
             return True
         else:
             return False

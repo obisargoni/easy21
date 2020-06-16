@@ -17,7 +17,7 @@ class Dealer():
     def playDealer(self, deck):
         '''
         '''
-        while self._hand_value < self._twist_limit:
+        while (self._hand_value < self._twist_limit) & (self._hand_value > 0):
             card = deck.draw()
             self._hand_value += card
 

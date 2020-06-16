@@ -164,23 +164,28 @@ for lam in lambda_values:
 
     trained_sarsa_agent = train_sarsaL_agent(sarsa_iter, lam, record_history)
     results.append(trained_sarsa_agent.q)
-    training_log.append(trained_sarsa_agent.log)
+    training_log.append((trained_sarsa_agent.log, lam))
 
 errors = [mse(q_sarsa, q500k) for q_sarsa in results]
 
 # PLot results - they don't show much of a pattern
 plt.figure()
 plt.scatter(lambda_values, errors)
+plt.xlabel("lambda")
+plt.ylabel("mse")
+plt.title("Error after {} episodes".format(sarsa_iter))
 plt.show()
 
 
 # Get learning curve results - lambda = 0 seems to learn faster. would you expect this for this game?
-for log in (training_log[0], training_log[-1]):
+for log,lam in (training_log[0], training_log[-1]):
     errs = [mse(i, q500k) for i in log]
     iter_number =list(range(len(log)))
     plt.figure()
     plt.scatter(iter_number, errs)
+    plt.title("Lambda = {}".format(lam))
     plt.show()
+
 '''
 
 trained_sarsa_agent = train_sarsaL_agent(100, 1, False)

@@ -94,18 +94,23 @@ def train_sarsaL_agent(n_iters, lam, record_history = False):
         card_table = Environment()
 
         sarsa_agent.init_etrace()
+        sarsa_agent.init_etrace_log()
+
         # game ends when terminal state is reached
         while card_table.is_state_terminal == False:
             s = card_table.state
+
             # Adjust sate so that it matches with 0 indexed indices of ndarrays
             s = (s[0]-1, s[1]-1)
 
             # agent takes action, gets reward
             a = sarsa_agent.choose_action(s)
+
             s_, r = card_table.step(a)
             s_ = (s_[0]-1, s_[1]-1)
 
             sarsa_agent.update_value_function(s,a,r,s_)
+            sarsa_agent.log_eligibility_trace(s+(a,))
 
         if record_history:
             sarsa_agent.log_value_function()
@@ -144,7 +149,9 @@ mc_agent_500k = train_mc_agent(500000)
 q500k = mc_agent_500k.q
 plot_value_function(q500k)
 
+
 # See how sarsa-lambda compares for different values of lambda
+
 sarsa_iter = 1000
 results = []
 training_log = []
@@ -174,3 +181,28 @@ for log in (training_log[0], training_log[-1]):
     plt.figure()
     plt.scatter(iter_number, errs)
     plt.show()
+'''
+
+trained_sarsa_agent = train_sarsaL_agent(100, 1, False)
+
+# Now plot elig trace
+
+def plot_etrace_function(etrace):
+
+    # Need to average over actions to get state value function
+    v = np.max(etrace, axis=2)
+
+    # Select just the states we are interested in plotting
+    #z = v[11:21,0:10]
+    z=v
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    #ax.plot_wireframe(x, y, z, rstride=1, cstride=1)
+    im = ax.imshow(z)
+    cbar = ax.figure.colorbar(im, ax=ax)
+    plt.show()
+
+    return ax
+
+'''

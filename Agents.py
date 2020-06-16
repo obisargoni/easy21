@@ -172,6 +172,9 @@ class sarsaL():
         # Log, used to record value functions during training
         self._log = []
 
+        self._Elog = []
+        self._slog = []
+
     @property
     def q(self):
         return self._q
@@ -183,10 +186,22 @@ class sarsaL():
     @property
     def log(self):
         return self._log
+
+    @property
+    def Elog(self):
+        return self._Elog
+
+    @property
+    def slog(self):
+        return self._slog
     
 
     def init_etrace(self):
         self._E = np.zeros(self._sss)
+
+    def init_etrace_log(self):
+        self._Elog = []
+        self._slog = []
 
     def epsilon_greedy_action(self, s):
         '''Impliment e-greedy action choice. Based on current state, action value function, and number of elapsed episodes
@@ -248,4 +263,8 @@ class sarsaL():
 
     def log_value_function(self):
         self._log.append(self._q.copy())
+
+    def log_eligibility_trace(self, s):
+        self._Elog.append(self._E.copy())
+        self._slog.append(s)
 

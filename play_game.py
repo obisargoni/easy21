@@ -85,7 +85,7 @@ def train_sarsaL_agent(n_iters, lam, record_history = False):
     state_space_size = [22,10,2]
 
     # initialise sarsa agent
-    sarsa_agent = sarsaL(state_space_size, lam, gamma = 1)
+    sarsa_agent = sarsaL(state_space_size, lam, gamma = 1, n0 = 10)
 
 
     # Train agent

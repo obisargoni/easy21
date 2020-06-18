@@ -9,7 +9,7 @@ class mc():
     '''Use monte carlo learning to learn value function
     '''
 
-    def __init__(self, state_space_size, gamma = 0.1):
+    def __init__(self, state_space_size, gamma = 0.1, n0 = 100):
         # Value function, number of times states visited, number of times states visited this episode
         self._q = np.zeros(state_space_size)
         self._n = np.zeros(state_space_size)
@@ -17,6 +17,8 @@ class mc():
 
         # Reward discount factor
         self._gamma = gamma
+
+        self._n0 = n0
 
 
     @property
@@ -34,7 +36,7 @@ class mc():
 
         # Set epsilon - updated each time n[s] changes
         # This is GLIE, since epsilon decays as n[s] increases, number of times a state has been visited increases
-        e = 100/(100 + self._n[s].sum())
+        e = self._n0/(self._n0 + self._n[s].sum())
 
         if random.random()<=e:
             # Choose random action
@@ -81,7 +83,7 @@ class mc():
 
 class sarsa():
 
-    def __init__(self, state_space_size, gamma = 0.1):
+    def __init__(self, state_space_size, gamma = 0.1, n0 = 100):
 
         # Value function, number of times states visited
         self._q = np.zeros(state_space_size)
@@ -89,6 +91,8 @@ class sarsa():
 
         # Reward discount factor
         self._gamma = gamma
+
+        self._n0 = n0
 
     @property
     def q(self):
@@ -105,7 +109,7 @@ class sarsa():
 
         # Set epsilon - updated each time n[s] changes
         # This is GLIE, since epsilon decays as n[s] increases, number of times a state has been visited increases
-        e = 100/(100 + self._n[s].sum())
+        e = self._n0/(self._n0 + self._n[s].sum())
 
         if random.random()<=e:
             # Choose random action
@@ -156,7 +160,7 @@ class sarsa():
 
 class sarsaL():
 
-    def __init__(self, state_space_size, lam, gamma = 1):
+    def __init__(self, state_space_size, lam, gamma = 1, n0 = 100):
         self._sss = state_space_size
 
         # Value function, number of times states visited, eligibility trace
@@ -165,6 +169,8 @@ class sarsaL():
 
          # Reward discount factor
         self._gamma = gamma
+
+        self._n0 = n0
 
         # lambda, use to calculate eligibility trace
         self._lam = lam
@@ -210,7 +216,7 @@ class sarsaL():
 
         # Set epsilon - updated each time n[s] changes
         # This is GLIE, since epsilon decays as n[s] increases, number of times a state has been visited increases
-        e = 100/(100 + self._n[s].sum())
+        e = self._n0/(self._n0 + self._n[s].sum())
 
         if random.random()<=e:
             # Choose random action

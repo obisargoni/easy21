@@ -118,7 +118,7 @@ def train_sarsaL_agent(n_iters, lam, record_history = False):
     # Return the trained agent
     return sarsa_agent
 
-def plot_value_function(q, f = "mc_value_function.png"):
+def plot_value_function(q, f = ".img\\mc_value_function.png"):
     # Plot values
 
     # Create 2d arrays to represent all possible dealer and player hands
@@ -176,7 +176,7 @@ plt.xlabel("lambda")
 plt.ylabel("mse")
 plt.title("Error after {} episodes".format(sarsa_iter))
 plt.show()
-plt.savefig("sarsa_lambda_vs_mc.png")
+plt.savefig(".img\\sarsa_lambda_vs_mc.png")
 
 
 # Get learning curve results - lambda = 0 seems to learn faster. would you expect this for this game?
@@ -187,7 +187,7 @@ for log,lam in (training_log[0], training_log[-1]):
     plt.scatter(iter_number, errs)
     plt.title("Lambda = {}".format(lam))
     plt.show()
-    plt.savefig("sarsa_lambda_{}_learn_rate.png".format(lam))
+    plt.savefig(".img\\sarsa_lambda_{}_learn_rate.png".format(lam))
 
 '''
 

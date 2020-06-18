@@ -160,7 +160,7 @@ class sarsaL():
         self._sss = state_space_size
 
         # Value function, number of times states visited, eligibility trace
-        self._q = np.zeros(self._sss)
+        self._q = np.zeros(self._sss) #np.random.random_sample(self._sss) # #
         self._n = np.zeros(self._sss)
 
          # Reward discount factor

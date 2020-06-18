@@ -5,21 +5,20 @@
 import numpy as np 
 import random
 
-class mc():
-    '''Use monte carlo learning to learn value function
-    '''
 
-    def __init__(self, state_space_size, gamma = 0.1, n0 = 100):
+class rl_agent():
+
+    def __init__(self, state_space_size, gamma, n0):
+        self._sss = state_space_size
+
         # Value function, number of times states visited, number of times states visited this episode
-        self._q = np.zeros(state_space_size)
-        self._n = np.zeros(state_space_size)
-        self._ne = np.zeros(state_space_size)
+        self._q = np.zeros(self._sss)
+        self._n = np.zeros(self._sss)
 
         # Reward discount factor
         self._gamma = gamma
 
         self._n0 = n0
-
 
     @property
     def q(self):
@@ -46,6 +45,26 @@ class mc():
             a = self._q[s].argmax()
 
         return a
+
+    def choose_action(self, s):
+
+        a = self.epsilon_greedy_action(s)
+
+        # Record how many times this state-action pair visited
+        sa = s +(a,)
+        self._n[sa] += 1
+        return a
+
+
+
+class mc(rl_agent):
+    '''Use monte carlo learning to learn value function
+    '''
+
+    def __init__(self, state_space_size, gamma = 1, n0 = 100):
+
+        super().__init__(state_space_size, gamma, n0)
+        self._ne = np.zeros(state_space_size)
 
     def choose_action(self, s):
 
@@ -81,53 +100,10 @@ class mc():
         return None
 
 
-class sarsa():
+class sarsa(rl_agent):
 
-    def __init__(self, state_space_size, gamma = 0.1, n0 = 100):
-
-        # Value function, number of times states visited
-        self._q = np.zeros(state_space_size)
-        self._n = np.zeros(state_space_size)
-
-        # Reward discount factor
-        self._gamma = gamma
-
-        self._n0 = n0
-
-    @property
-    def q(self):
-        return self._q
-    
-    @property
-    def n(self):
-        return self._n
-
-    def epsilon_greedy_action(self, s):
-        '''Impliment e-greedy action choice. Based on current state, action value function, and number of elapsed episodes
-        make an e-greedy action choice. In this way, the agent policy is updated.
-        '''
-
-        # Set epsilon - updated each time n[s] changes
-        # This is GLIE, since epsilon decays as n[s] increases, number of times a state has been visited increases
-        e = self._n0/(self._n0 + self._n[s].sum())
-
-        if random.random()<=e:
-            # Choose random action
-            a = random.choice(np.arange(self._q[s].size))
-        else:
-            # Choose greedy
-            a = self._q[s].argmax()
-        
-        return a
-
-    def choose_action(self, s):
-
-        a = self.epsilon_greedy_action(s)
-
-        # Record how many times this state-action pair visited
-        sa = s +(a,)
-        self._n[sa] += 1
-        return a
+    def __init__(self, state_space_size, gamma = 1.0, n0 = 100):
+        super().__init__(state_space_size, gamma, n0)
 
 
     def update_value_function(self,s,a,r,s_):
@@ -158,19 +134,10 @@ class sarsa():
         return None
 
 
-class sarsaL():
+class sarsaL(rl_agent):
 
     def __init__(self, state_space_size, lam, gamma = 1, n0 = 100):
-        self._sss = state_space_size
-
-        # Value function, number of times states visited, eligibility trace
-        self._q = np.zeros(self._sss) #np.random.random_sample(self._sss) # #
-        self._n = np.zeros(self._sss)
-
-         # Reward discount factor
-        self._gamma = gamma
-
-        self._n0 = n0
+        super().__init__(state_space_size, gamma, n0)
 
         # lambda, use to calculate eligibility trace
         self._lam = lam
@@ -180,14 +147,6 @@ class sarsaL():
 
         self._Elog = []
         self._slog = []
-
-    @property
-    def q(self):
-        return self._q
-    
-    @property
-    def n(self):
-        return self._n
 
     @property
     def log(self):
@@ -208,33 +167,6 @@ class sarsaL():
     def init_etrace_log(self):
         self._Elog = []
         self._slog = []
-
-    def epsilon_greedy_action(self, s):
-        '''Impliment e-greedy action choice. Based on current state, action value function, and number of elapsed episodes
-        make an e-greedy action choice. In this way, the agent policy is updated.
-        '''
-
-        # Set epsilon - updated each time n[s] changes
-        # This is GLIE, since epsilon decays as n[s] increases, number of times a state has been visited increases
-        e = self._n0/(self._n0 + self._n[s].sum())
-
-        if random.random()<=e:
-            # Choose random action
-            a = random.choice(np.arange(self._q[s].size))
-        else:
-            # Choose greedy
-            a = self._q[s].argmax()
-        
-        return a
-
-    def choose_action(self, s):
-
-        a = self.epsilon_greedy_action(s)
-
-        # Record how many times this state-action pair visited
-        sa = s +(a,)
-        self._n[sa] += 1
-        return a
 
     def update_value_function(self,s,a,r,s_):
         '''Update the agents value function based on the state the agent was in, the action the agent took, and the reward the agent received

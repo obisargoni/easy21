@@ -1,3 +1,6 @@
+import numpy as np
+import itertools
+
 class FeatureVector():
 
     def __init__(self, *args):
@@ -16,14 +19,16 @@ class FeatureVector():
 
         lim_inds = []
 
+        # Get the indicies of the features that this state activates
         for dim,s_ in enumerate(s):
-            ind = []
+            inds = []
             for i,r in enumerate(self._limits[dim]):
                 if s_ in r:
                     inds.append(i)
             lim_inds.append(inds)
 
-        lim_inds = itertools.product(*lim_inds)
+        # Pair each agent feature index up with each dealer feature index
+        lim_inds = list(itertools.product(*lim_inds))
         return lim_inds
 
     def state_feature_vector(self, s):
@@ -37,7 +42,7 @@ class FeatureVector():
         for li in lim_inds:
             # Convert each limit index tuple, indication activated feature for each dimension, to a single index corresponding to that location in the feature vector
             fv_index = sum([li[i] * np.product(self._nlims[(i+1):]) for i in range(self._ndims-1)])
-            fv_index = fv_index + lim_inds[-1]
+            fv_index = fv_index + li[-1]
             fv_indices.append(fv_index)
 
         # 1d feature vector

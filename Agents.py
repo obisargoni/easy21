@@ -211,7 +211,7 @@ class sarsaLApprox():
 
     def __init__(self, sss, lam, gamma = 1.0, n0 = 100):
 
-    	# Size of feature vector, use as state space size
+        # Size of feature vector, use as state space size
         self._sss = sss
 
         # Weights vector
@@ -285,12 +285,12 @@ class sarsaLApprox():
         self._E = np.zeros(self._sss)
 
     def update_etrace(self, s, a):
-    	# Reduce eligibility of all elements
-    	self._E = self._gamma * self._lam * self._E
+        # Reduce eligibility of all elements
+        self._E = self._gamma * self._lam * self._E
 
-    	# Get index to update from state vector and increase eligibility of these elements
-    	inds = np.where(s==1)[0]
-    	self._E[a, inds] += 1
+        # Get index to update from state vector and increase eligibility of these elements
+        inds = np.where(s==1)[0]
+        self._E[a, inds] += 1
 
     def init_etrace_log(self):
         self._Elog = []
@@ -319,7 +319,7 @@ class sarsaLApprox():
 
         # TD update those ewights corresponding to the feature vector elements
         alpha = 0.01
-    	self._w += alpha * td_error * self._E
+        self._w += alpha * td_error * self._E
 
         return None
 

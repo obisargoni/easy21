@@ -2,9 +2,10 @@
 import numpy as np
 import pandas as pd
 import random
-from Environment import Environment
 
-from Agents import sarsa, mc, sarsaL
+from Environment import Environment
+from Agents import sarsa, mc, sarsaL, sarsaLApprox
+from FeatureVector import FeatureVector
 
 import matplotlib as mpl
 from matplotlib import cm
@@ -118,6 +119,52 @@ def train_sarsaL_agent(n_iters, lam, record_history = False):
     # Return the trained agent
     return sarsa_agent
 
+def train_sarsaLApprox_agent(n_iters, lam, record_history = False):
+
+    # Create feature vector
+    agent_features = [range(1,7), range(4,10), range(7,13), range(10,16), range(13, 19), range(16,22)]
+    dealer_features = [range(1,5), range(4,8), range(7,11)]
+
+    # Must pass agent features first since agent hand is first in state
+    agent_feature_vector = FeatureVector(agent_features, dealer_features)
+
+    state_space_size = (2, agent_feature_vector.fv_size)
+
+    # initialise sarsa agent
+    sarsa_agent = sarsaLApprox(state_space_size, lam, gamma = 1, n0 = 10)
+
+
+    # Train agent
+    for i in range(n_iters):
+        # initialise the environment
+        card_table = Environment()
+
+        sarsa_agent.init_etrace()
+        sarsa_agent.init_etrace_log()
+
+        # game ends when terminal state is reached
+        while card_table.is_state_terminal == False:
+            s = card_table.state
+
+            fvs = agent_feature_vector.state_feature_vector(s)
+
+            # agent takes action, gets reward
+            a = sarsa_agent.choose_action(fvs)
+
+            s_, r = card_table.step(a)
+            fvs_ = agent_feature_vector.state_feature_vector(s_)
+
+            sarsa_agent.update_value_function(fvs,a,r,fvs_)
+
+        '''
+            sarsa_agent.log_eligibility_trace(s+(a,))
+
+        if record_history:
+            sarsa_agent.log_value_function()
+        '''
+
+    # Return the trained agent
+    return sarsa_agent
 def plot_value_function(q, f = ".\\img\\mc_value_function.png"):
     # Plot values
 

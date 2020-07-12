@@ -206,3 +206,126 @@ class sarsaL(rl_agent):
         self._Elog.append(self._E.copy())
         self._slog.append(s)
 
+
+class sarsaLApprox():
+
+    def __init__(self, sss, lam, gamma = 1.0, n0 = 100):
+
+    	# Size of feature vector, use as state space size
+        self._sss = sss
+
+        # Weights vector
+        self._w = np.zeros(self._sss)
+
+        # Number of times state visited - not used due to constant alpha and exploration rate
+        self._n = None
+
+        # Reward discount factor
+        self._gamma = gamma
+
+        # Constant used to control exploration
+        self._n0 = n0
+
+        # lambda, use to calculate eligibility trace
+        self._lam = lam
+
+        # Log, used to record value functions during training
+        self._log = []
+
+        self._Elog = []
+        self._slog = []
+
+    def q(self, s):
+        q = np.dot(self._w,s)
+        return q
+
+    def q(self, s, a):
+        q = np.dot(self._w,s)
+        return q[a]    
+
+    @property
+    def log(self):
+        return self._log
+
+    @property
+    def Elog(self):
+        return self._Elog
+
+    @property
+    def slog(self):
+        return self._slog
+
+
+    def epsilon_greedy_action(self, s):
+        '''Impliment e-greedy action choice. Based on current state, action value function, and number of elapsed episodes
+        make an e-greedy action choice. In this way, the agent policy is updated.
+        '''
+
+        # Set epsilon - updated each time n[s] changes
+        # This is GLIE, since epsilon decays as n[s] increases, number of times a state has been visited increases
+        #e = self._n0/(self._n0 + self._n[s].sum())
+        e = 0.05 # constant rate of exploration 
+
+        if random.random()<=e:
+            # Choose random action
+            a = random.choice(np.arange(self.q(s).size))
+        else:
+            # Choose greedy
+            a = self.q(s).argmax()
+
+        return a
+
+    def choose_action(self, s):
+
+        a = self.epsilon_greedy_action(s)
+        return a
+    
+
+    def init_etrace(self):
+        self._E = np.zeros(self._sss)
+
+    def update_etrace(self, s, a):
+    	# Reduce eligibility of all elements
+    	self._E = self._gamma * self._lam * self._E
+
+    	# Get index to update from state vector and increase eligibility of these elements
+    	inds = np.where(s==1)[0]
+    	self._E[a, inds] += 1
+
+    def init_etrace_log(self):
+        self._Elog = []
+        self._slog = []
+
+    def update_value_function(self,s,a,r,s_):
+        '''Update the agents value function based on the state the agent was in, the action the agent took, and the reward the agent received
+
+        s: the state the agent was in
+        a: the action the agent took
+        r: the reward the agent received
+        s_: the new state of the system
+        '''
+
+        # Update eligibility trace
+        self.update_etrace(s,a)
+
+        # Not sure how to check if state is terminal here            
+        # Need to get a_, action under this or previous policy?
+        # Use this policy since that is the action we would expect to take (haven't updated policy yet either)
+        a_ = self.epsilon_greedy_action(s_)
+        expeced_reward = self.q(s_, a_)
+
+        # Perform backwards view update - is mask needed here?
+        td_error = r + self._gamma*expeced_reward - self.q(sa)
+
+        # TD update those ewights corresponding to the feature vector elements
+        alpha = 0.01
+    	self._w += alpha * td_error * self._E
+
+        return None
+
+    def log_value_function(self):
+        self._log.append(self._q.copy())
+
+    def log_eligibility_trace(self, s):
+        self._Elog.append(self._E.copy())
+        self._slog.append(s)

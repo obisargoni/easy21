@@ -235,13 +235,12 @@ class sarsaLApprox():
         self._Elog = []
         self._slog = []
 
-    def q(self, s):
+    def q(self, s, a = None):
         q = np.dot(self._w,s)
-        return q
-
-    def q(self, s, a):
-        q = np.dot(self._w,s)
-        return q[a]    
+        if a is None:
+            return q
+        else:
+            return q[a] 
 
     @property
     def log(self):
@@ -315,7 +314,7 @@ class sarsaLApprox():
         expeced_reward = self.q(s_, a_)
 
         # Perform backwards view update - is mask needed here?
-        td_error = r + self._gamma*expeced_reward - self.q(sa)
+        td_error = r + self._gamma*expeced_reward - self.q(s,a=a)
 
         # TD update those ewights corresponding to the feature vector elements
         alpha = 0.01

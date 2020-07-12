@@ -44,3 +44,9 @@ class FeatureVector():
 		fv = np.zeros(np.product(self._nlims))
 		fv[fv_indices] = 1
 		return fv
+
+	@property
+	def fv_size(self):
+		fv_size = np.product(self._nlims)
+		return fv_size
+	

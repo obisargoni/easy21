@@ -2,6 +2,7 @@
 import numpy as np
 import pandas as pd
 import random
+import itertools
 
 from Environment import Environment
 from Agents import sarsa, mc, sarsaL, sarsaLApprox
@@ -160,6 +161,33 @@ def train_sarsaLApprox_agent(n_iters, lam, record_history = False):
 
     # Return the trained agent
     return sarsa_agent
+
+def q_from_weights(agent):
+
+    # Similar to stating the state space size, here need to iterate through the available states
+    player_hands = range(1,23)
+    dealer_hands = range(1,11)
+    actions = range(2)
+
+    state_space_size = [len(player_hands), len(dealer_hands), len(actions)]
+
+    # initialise full value function
+    q = np.zeros(state_space_size)
+
+    all_hands = itertools.product(list(player_hands), list(dealer_hands))
+    all_hands = itertools.product(player_hands, dealer_hands)
+
+    # Loop through all possible hands, get feature vector, multiply by weights get value for either action
+    for s in all_hands:
+        for a in actions:
+            # convert state to value function index
+            ind = tuple(i-1 for i in s) + (a,)
+            fvs = agent._fv.state_feature_vector(s)
+
+            q[ind] = agent._q(fvs, a=a)
+
+    return q
+
 def plot_value_function(q, f = ".\\img\\mc_value_function.png"):
     # Plot values
 
@@ -230,6 +258,10 @@ for log,lam in (training_log[0], training_log[-1]):
     plt.title("Lambda = {}".format(lam))
     plt.show()
     plt.savefig(".\\img\\sarsa_lambda_{}_learn_rate.png".format(lam))
+
+
+trained_sarsa_approx_agent = train_sarsaLApprox_agent(1000, 0.1)
+
 
 '''
 

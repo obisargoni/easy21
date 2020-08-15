@@ -231,7 +231,7 @@ class sarsaLApprox():
         # lambda, use to calculate eligibility trace
         self._lam = lam
 
-        # Log, used to record value functions during training
+        # Log, used to record weights during training
         self._log = []
 
         self._Elog = []
@@ -331,8 +331,8 @@ class sarsaLApprox():
 
         return None
 
-    def log_value_function(self):
-        self._log.append(self._q.copy())
+    def log_weights(self):
+        self._log.append(self._w.copy())
 
     def log_eligibility_trace(self, s):
         self._Elog.append(self._E.copy())

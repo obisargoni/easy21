@@ -21,7 +21,7 @@ class rl_agent():
         self._n0 = n0
 
     @property
-    def _q(self):
+    def q(self):
         return self._q
     
     @property
@@ -161,10 +161,10 @@ class sarsaL(rl_agent):
         return self._slog
     
 
-    def _init_etrace(self):
+    def init_etrace(self):
         self._E = np.zeros(self._sss)
 
-    def _init_etrace_log(self):
+    def init_etrace_log(self):
         self._Elog = []
         self._slog = []
 
@@ -285,7 +285,7 @@ class sarsaLApprox():
         return a
     
 
-    def _init_etrace(self):
+    def init_etrace(self):
         self._E = np.zeros(self._sss)
 
     def _update_etrace(self, s, a):
@@ -296,7 +296,7 @@ class sarsaLApprox():
         inds = np.where(s==1)[0]
         self._E[a, inds] += 1
 
-    def _init_etrace_log(self):
+    def init_etrace_log(self):
         self._Elog = []
         self._slog = []
 

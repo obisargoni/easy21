@@ -209,10 +209,12 @@ class sarsaL(rl_agent):
 
 class sarsaLApprox():
 
-    def __init__(self, sss, lam, gamma = 1.0, n0 = 100):
+    def __init__(self, fv, lam, gamma = 1.0, n0 = 100):
+
+        self._fv = fv
 
         # Size of feature vector, use as state space size
-        self._sss = sss
+        self._sss = self._fv.fv_size
 
         # Weights vector
         self._w = np.zeros(self._sss)
@@ -276,7 +278,10 @@ class sarsaLApprox():
 
     def choose_action(self, s):
 
-        a = self.epsilon_greedy_action(s)
+        # Convert state to feature vector
+        fvs = self._fv.state_feature_vector(s)
+
+        a = self._epsilon_greedy_action(fvs)
         return a
     
 
@@ -304,17 +309,21 @@ class sarsaLApprox():
         s_: the new state of the system
         '''
 
+         # Convert state to feature vector
+        fvs = self._fv.state_feature_vector(s)
+        fvs_ = self._fv.state_feature_vector(s_)
+
         # Update eligibility trace
-        self.update_etrace(s,a)
+        self._update_etrace(fvs,a)
 
         # Not sure how to check if state is terminal here            
         # Need to get a_, action under this or previous policy?
         # Use this policy since that is the action we would expect to take (haven't updated policy yet either)
-        a_ = self.epsilon_greedy_action(s_)
-        expeced_reward = self.q(s_, a_)
+        a_ = self._epsilon_greedy_action(fvs_)
+        expeced_reward = self._q(fvs_, a_)
 
         # Perform backwards view update - is mask needed here?
-        td_error = r + self._gamma*expeced_reward - self.q(s,a=a)
+        td_error = r + self._gamma*expeced_reward - self._q(fvs,a=a)
 
         # TD update those ewights corresponding to the feature vector elements
         alpha = 0.01

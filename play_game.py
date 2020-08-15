@@ -128,10 +128,8 @@ def train_sarsaLApprox_agent(n_iters, lam, record_history = False):
     # Must pass agent features first since agent hand is first in state
     agent_feature_vector = FeatureVector(agent_features, dealer_features)
 
-    state_space_size = (2, agent_feature_vector.fv_size)
-
     # initialise sarsa agent
-    sarsa_agent = sarsaLApprox(state_space_size, lam, gamma = 1, n0 = 10)
+    sarsa_agent = sarsaLApprox(agent_feature_vector, lam, gamma = 1, n0 = 10)
 
 
     # Train agent
@@ -146,15 +144,12 @@ def train_sarsaLApprox_agent(n_iters, lam, record_history = False):
         while card_table.is_state_terminal == False:
             s = card_table.state
 
-            fvs = agent_feature_vector.state_feature_vector(s)
-
             # agent takes action, gets reward
-            a = sarsa_agent.choose_action(fvs)
+            a = sarsa_agent.choose_action(s)
 
             s_, r = card_table.step(a)
-            fvs_ = agent_feature_vector.state_feature_vector(s_)
 
-            sarsa_agent.update_value_function(fvs,a,r,fvs_)
+            sarsa_agent.update_value_function(s,a,r,s_)
 
         '''
             sarsa_agent.log_eligibility_trace(s+(a,))

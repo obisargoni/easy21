@@ -21,14 +21,14 @@ class rl_agent():
         self._n0 = n0
 
     @property
-    def q(self):
+    def _q(self):
         return self._q
     
     @property
     def n(self):
         return self._n
 
-    def epsilon_greedy_action(self, s):
+    def _epsilon_greedy_action(self, s):
         '''Impliment e-greedy action choice. Based on current state, action value function, and number of elapsed episodes
         make an e-greedy action choice. In this way, the agent policy is updated.
         '''
@@ -48,7 +48,7 @@ class rl_agent():
 
     def choose_action(self, s):
 
-        a = self.epsilon_greedy_action(s)
+        a = self._epsilon_greedy_action(s)
 
         # Record how many times this state-action pair visited
         sa = s +(a,)
@@ -68,7 +68,7 @@ class mc(rl_agent):
 
     def choose_action(self, s):
 
-        a = self.epsilon_greedy_action(s)
+        a = self._epsilon_greedy_action(s)
 
         # Record how many times this state-action pair visited
         sa = s +(a,)
@@ -161,10 +161,10 @@ class sarsaL(rl_agent):
         return self._slog
     
 
-    def init_etrace(self):
+    def _init_etrace(self):
         self._E = np.zeros(self._sss)
 
-    def init_etrace_log(self):
+    def _init_etrace_log(self):
         self._Elog = []
         self._slog = []
 
@@ -180,7 +180,7 @@ class sarsaL(rl_agent):
         # Not sure how to check if state is terminal here            
         # Need to get a_, action under this or previous policy?
         # Use this policy since that is the action we would expect to take (haven't updated policy yet either)
-        a_ = self.epsilon_greedy_action(s_)
+        a_ = self._epsilon_greedy_action(s_)
         sa_ = s_ + (a_,)
         expeced_reward = self._q[sa_]
 
@@ -235,7 +235,7 @@ class sarsaLApprox():
         self._Elog = []
         self._slog = []
 
-    def q(self, s, a = None):
+    def _q(self, s, a = None):
         q = np.dot(self._w,s)
         if a is None:
             return q
@@ -255,7 +255,7 @@ class sarsaLApprox():
         return self._slog
 
 
-    def epsilon_greedy_action(self, s):
+    def _epsilon_greedy_action(self, s):
         '''Impliment e-greedy action choice. Based on current state, action value function, and number of elapsed episodes
         make an e-greedy action choice. In this way, the agent policy is updated.
         '''
@@ -267,10 +267,10 @@ class sarsaLApprox():
 
         if random.random()<=e:
             # Choose random action
-            a = random.choice(np.arange(self.q(s).size))
+            a = random.choice(np.arange(self._q(s).size))
         else:
             # Choose greedy
-            a = self.q(s).argmax()
+            a = self._q(s).argmax()
 
         return a
 
@@ -280,10 +280,10 @@ class sarsaLApprox():
         return a
     
 
-    def init_etrace(self):
+    def _init_etrace(self):
         self._E = np.zeros(self._sss)
 
-    def update_etrace(self, s, a):
+    def _update_etrace(self, s, a):
         # Reduce eligibility of all elements
         self._E = self._gamma * self._lam * self._E
 
@@ -291,7 +291,7 @@ class sarsaLApprox():
         inds = np.where(s==1)[0]
         self._E[a, inds] += 1
 
-    def init_etrace_log(self):
+    def _init_etrace_log(self):
         self._Elog = []
         self._slog = []
 

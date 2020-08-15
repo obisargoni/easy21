@@ -214,7 +214,7 @@ class sarsaLApprox():
         self._fv = fv
 
         # Size of feature vector, use as state space size
-        self._sss = self._fv.fv_size
+        self._sss = (2, self._fv.fv_size)
 
         # Weights vector
         self._w = np.zeros(self._sss)
@@ -238,7 +238,7 @@ class sarsaLApprox():
         self._slog = []
 
     def _q(self, s, a = None):
-        q = np.dot(self._w,s)
+        q = np.matmul(self._w, s)
         if a is None:
             return q
         else:

@@ -237,12 +237,19 @@ class sarsaLApprox():
         self._Elog = []
         self._slog = []
 
-    def _q(self, s, a = None):
-        q = np.matmul(self._w, s)
+    def _q(self, s, a = None, historic_weight_index = None):
+
+        # First get weights to use
+        if (historic_weight_index is None):
+            w = self._w
+        else:
+            w = self._log[historic_weight_index]
+
+        q = np.matmul(w, s)
         if a is None:
             return q
         else:
-            return q[a] 
+            return q[a]
 
     @property
     def log(self):

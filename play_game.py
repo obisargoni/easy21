@@ -130,7 +130,7 @@ def train_sarsaLApprox_agent(n_iters, lam, record_history = False):
     agent_feature_vector = FeatureVector(agent_features, dealer_features)
 
     # initialise sarsa agent
-    sarsa_agent = sarsaLApprox(agent_feature_vector, lam, gamma = 1, n0 = 10)
+    sarsa_approx_agent = sarsaLApprox(agent_feature_vector, lam, gamma = 1, n0 = 10)
 
 
     # Train agent
@@ -138,31 +138,27 @@ def train_sarsaLApprox_agent(n_iters, lam, record_history = False):
         # initialise the environment
         card_table = Environment()
 
-        sarsa_agent.init_etrace()
-        sarsa_agent.init_etrace_log()
+        sarsa_approx_agent.init_etrace()
+        sarsa_approx_agent.init_etrace_log()
 
         # game ends when terminal state is reached
         while card_table.is_state_terminal == False:
             s = card_table.state
 
             # agent takes action, gets reward
-            a = sarsa_agent.choose_action(s)
+            a = sarsa_approx_agent.choose_action(s)
 
             s_, r = card_table.step(a)
 
-            sarsa_agent.update_value_function(s,a,r,s_)
-
-        '''
-            sarsa_agent.log_eligibility_trace(s+(a,))
+            sarsa_approx_agent.update_value_function(s,a,r,s_)
 
         if record_history:
-            sarsa_agent.log_value_function()
-        '''
+            sarsa_approx_agent.log_weights()
 
     # Return the trained agent
-    return sarsa_agent
+    return sarsa_approx_agent
 
-def q_from_weights(agent):
+def q_from_weights(agent, historic_weight_index = None):
 
     # Similar to stating the state space size, here need to iterate through the available states
     player_hands = range(1,23)
@@ -184,7 +180,7 @@ def q_from_weights(agent):
             ind = tuple(i-1 for i in s) + (a,)
             fvs = agent._fv.state_feature_vector(s)
 
-            q[ind] = agent._q(fvs, a=a)
+            q[ind] = agent._q(fvs, a=a, historic_weight_index = historic_weight_index)
 
     return q
 
@@ -220,8 +216,13 @@ mc_agent_500k = train_mc_agent(500000)
 q500k = mc_agent_500k.q
 plot_value_function(q500k)
 
-
+##########################################
+#
+#
 # See how sarsa-lambda compares for different values of lambda
+#
+#
+##########################################
 
 sarsa_iter = 1000
 results = []
@@ -260,7 +261,54 @@ for log,lam in (training_log[0], training_log[-1]):
     plt.savefig(".\\img\\sarsa_lambda_{}_learn_rate.png".format(lam))
 
 
+
+###############################################
+#
+#
+# Repeate experiment using value function approximation
+#
+#
+###############################################
+
 trained_sarsa_approx_agent = train_sarsaLApprox_agent(1000, 0.1)
+plot_value_function(q_from_weights(trained_sarsa_approx_agent), f = ".\\img\\q_sarsa_approx.png")
+
+sarsa_iter = 1000
+results = []
+training_log = []
+lambda_values = np.arange(0,1.1,0.1)
+for lam in lambda_values:
+    if lam in [0, 1.0]:
+        record_history = True
+    else:
+        record_history = False
+
+    trained_sarsa_agent = train_sarsaLApprox_agent(sarsa_iter, lam, record_history)
+    results.append(q_from_weights(trained_sarsa_agent))
+    training_log.append((trained_sarsa_agent, lam))
+
+errors = [mse(q_sarsa_approx, q500k) for q_sarsa_approx in results]
+
+# PLot results - they don't show much of a pattern
+plt.figure()
+plt.scatter(lambda_values, errors)
+plt.xlabel("lambda")
+plt.ylabel("mse")
+plt.title("Error after {} episodes - vfa".format(sarsa_iter))
+plt.show()
+plt.savefig(".\\img\\sarsa_lambda_vs_mc_vfa.png")
+
+
+# Get learning curve results - lambda = 0 seems to learn faster. would you expect this for this game?
+for trained_agent,lam in (training_log[0], training_log[-1]):
+    log = trained_agent.log
+    errs = [mse(q_from_weights(trained_agent,historic_weight_index = i), q500k) for i in range(len(log))]
+    iter_number =list(range(len(log)))
+    plt.figure()
+    plt.scatter(iter_number, errs)
+    plt.title("Lambda = {}".format(lam))
+    plt.show()
+    plt.savefig(".\\img\\sarsa_lambda_{}_learn_rate_vfa.png".format(lam))
 
 
 '''

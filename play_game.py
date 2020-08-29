@@ -336,3 +336,37 @@ def plot_etrace_function(etrace):
     return ax
 
 '''
+
+
+##############################################
+#
+#
+# Answering questions
+#
+#
+##############################################
+'''
+1. Pros vs cons of bootstrapping for easy21?
+
+pros - only get rewards at end state so boot strapping helps avoid outlier estimates of states that are far from end state
+
+cons - seems to give higher error
+
+2. Would bootstrapping help more in balckjack or easy21
+
+i easy21 has more states before end state + reward. More actions to be taken before reciving reward.
+- would expect bootstrapping to be more useful in easy21 as can reduce variance of value function approximation, avoid producing widely varying estimates for states
+that are 'far' from end state
+
+3. Pros and cons of function approximation in easy21?
+
+- Pro: many states in the game have similar value and so value function approx can make use of this to speed up learning.
+- Con: state space isnt large so vfa not necessary
+
+4. How to improve vfa
+
+- many states have similar value where as some states are more important to estimate value of correctly as they are neither clearly safe or close to going bust (ie value function has high gradient at cetain states)
+VFA would be improved by accounting for this, with coarser approximation where gradient is low and more granular approximation where gradient is higher.
+
+
+'''
